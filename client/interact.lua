@@ -1,9 +1,9 @@
 -- lcky-status/client/interact.lua
--- ox_lib context menu ve etkileşim fonksiyonları
+-- ox_lib context menu and interaction functions
 
--- Durum context menüsünü oluştur
+-- Create the status context menu
 local function CreateStatusMenu(currentStatus)
-    local statusDisplay = currentStatus and currentStatus or "Mevcut durum yok."
+    local statusDisplay = currentStatus and currentStatus or "No status set."
     
     lib.registerContext({
         id = 'lcky-status-menu',
@@ -14,7 +14,7 @@ local function CreateStatusMenu(currentStatus)
                 title = 'Current Status',
                 description = statusDisplay,
                 icon = 'user',
-                readOnly = true,  -- Salt okunur, tıklanamaz
+                readOnly = true,  -- Read-only, not clickable
             },
             {
                 title = 'Update Status',
@@ -36,7 +36,7 @@ local function CreateStatusMenu(currentStatus)
     })
 end
 
--- Durum güncelleme dialog'u
+-- Status update dialog
 function OpenUpdateDialog()
     local status = lib.inputDialog('Update Status', {
         {
@@ -57,43 +57,43 @@ function OpenUpdateDialog()
     local newStatus = status[1]
     SetPlayerStatus(newStatus)
 
-    lib.notify({
+    Bridge.Notify({
         title = 'Status Updated',
         description = 'Your new status: ' .. newStatus,
         type = 'success',
         duration = 3000
     })
 
-    -- Yakındaki oyunculara bildirim gönder
+    -- Notify nearby players
     NotifyNearbyPlayers()
 end
 
--- Yakındaki oyunculara bildirim gönder
+-- Notify nearby players
 function NotifyNearbyPlayers()
     local playerPed = PlayerPedId()
     local playerCoords = GetEntityCoords(playerPed)
     local notificationDistance = 10.0
 
-    -- lib.getNearbyPlayers kullanarak yakındaki oyuncuları al
+    -- Get nearby players using lib.getNearbyPlayers
     local nearbyPlayers = lib.getNearbyPlayers(playerCoords, notificationDistance, false)
 
-    -- Yakındaki her oyuncuya bildirim gönder
+    -- Send notification to each nearby player
     for i = 1, #nearbyPlayers do
         local player = nearbyPlayers[i]
         TriggerServerEvent('lcky-status:server:sendNotifyToPlayer', player.id)
     end
 end
 
--- Durumu temizle
+-- Clear status
 function ClearStatus()
-    -- Server event tetikle - durumu temizle
+    -- Trigger server event - clear status
     TriggerServerEvent('lcky-status:server:clearStatus')
     
-    -- Menü kapat
+    -- Close menu
     lib.hideContext()
     
-    -- Başarı bildirimi
-    lib.notify({
+    -- Success notification
+    Bridge.Notify({
         title = 'Status Cleared',
         description = 'Your status has been cleared successfully.',
         type = 'success',
@@ -101,12 +101,12 @@ function ClearStatus()
     })
 end
 
--- Ana context menüyü aç
+-- Open main context menu
 function OpenStatusMenu()
-    -- Server'dan mevcut durumu al
+    -- Get current status from server
     local currentStatus = GetPlayerStatusFromServer()
     
-    -- Menü oluştur ve göster
+    -- Create and show menu
     CreateStatusMenu(currentStatus)
     lib.showContext('lcky-status-menu')
 end
