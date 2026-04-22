@@ -1,44 +1,54 @@
 -- lcky-status/client/target.lua
--- ox_target entegrasyonu - Oyuncu hedefleme
+-- Target integration - Player targeting
 
--- Oyuncu hedefleme seçeneklerini ekle
+-- Add player targeting options
 local function AddPlayerTargetOptions()
-    exports.ox_target:addGlobalPlayer({
+    Bridge.AddGlobalPlayerTarget({
         {
             name = 'lcky-status-show',
             label = 'Show Status',
             icon = 'fa-user-tag',
             distance = 3.0,
             onSelect = function(data)
-                -- Hedef oyuncunun server ID'sini al
+                -- Get target player's server ID
                 local targetPed = data.entity
                 local targetServerId = GetPlayerServerId(NetworkGetPlayerIndexFromPed(targetPed))
                 
-                -- Server'dan durumu al (callback)
+                -- Get status from server (callback)
                 local targetStatus = lib.callback.await('lcky-status:server:getPlayerStatusById', false, targetServerId)
                 
-                -- Durumu chate yaz
+                -- Display status
                 if targetStatus and targetStatus ~= nil then
-                    lib.print.info('Player Status: ' .. targetStatus)
+                    Bridge.Notify({
+                        title = 'Player Status',
+                        description = targetStatus,
+                        type = 'inform'
+                    })
                 else
-                    lib.print.info('No Status')
+                    Bridge.Notify({
+                        title = 'Player Status',
+                        description = 'No Status',
+                        type = 'error'
+                    })
                 end
             end,
         },
     })
 end
 
--- Resource başlatıldığında hedefleme seçeneklerini ekle
-AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
-    AddPlayerTargetOptions()
-end)
+-- Framework-specific player loaded events
+if Bridge.Framework == 'qbcore' or Bridge.Framework == 'qbox' then
+    AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+        AddPlayerTargetOptions()
+    end)
+elseif Bridge.Framework == 'esx' then
+    RegisterNetEvent('esx:playerLoaded', function()
+        AddPlayerTargetOptions()
+    end)
+end
 
-
--- Sistemi yeniden başlattığımda çalışması için eklendi, silinecek
+-- On resource start (for development or script restart)
 AddEventHandler('onResourceStart', function(resourceName)
-  if (GetCurrentResourceName() ~= resourceName) then
-    return
-  end
-  print('The resource ' .. resourceName .. ' has been started.')
-  AddPlayerTargetOptions()
+    if (GetCurrentResourceName() ~= resourceName) then return end
+    AddPlayerTargetOptions()
 end)
