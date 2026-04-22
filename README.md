@@ -1,29 +1,39 @@
 # 🏷️ lcky-status
 
-**lcky-status** is a lightweight, high-performance, and modern player status system designed for FiveM servers using the **Qbox/QBCore** framework. It allows players to set custom text statuses that others can view through physical interaction or proximity notifications.
+**lcky-status** is a lightweight, high-performance, and modern player status system designed for FiveM servers. It features an advanced **Bridge** system that ensures full compatibility with multiple frameworks and targeting systems.
 
-[![Version](https://img.shields.io/badge/version-0.2.0-green.svg)](https://github.com/lcky-scripts/lcky-status)
-[![Framework](https://img.shields.io/badge/framework-Qbox-blue.svg)](https://github.com/Qbox-Project/qbx_core)
+[![Version](https://img.shields.io/badge/version-0.3.0-green.svg)](https://github.com/lcky-scripts/lcky-status)
+[![Framework](https://img.shields.io/badge/framework-Qbox%20%7C%20QBCore%20%7C%20ESX-blue.svg)](https://github.com/lcky-scripts/lcky-status)
+[![Target](https://img.shields.io/badge/target-ox__target%20%7C%20qb--target-orange.svg)](https://github.com/lcky-scripts/lcky-status)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)
 
 ---
 
 ## ✨ Features
 
-- 💾 **Metadata Based Storage**: Utilizes `qbx_core` metadata system. No extra SQL tables or database bloat.
-- 👁️ **Targeting System**: Integrated with `ox_target` to allow players to inspect others' statuses by looking at them.
+- 🌉 **Advanced Bridge System**: Automatically detects and adapts to your server's framework and target system.
+- 💾 **Metadata Based Storage**: Utilizes native metadata systems (Qbox, QBCore, ESX Meta). No extra SQL tables required.
+- 🎨 **Modern UI**: Clean and responsive context menus and input dialogs powered by `ox_lib`.
+- 👁️ **Multi-Targeting Support**: Works out-of-the-box with `ox_target` and `qb-target`.
 - 🔊 **Proximity Notifications**: Automatically notifies nearby players (within 10m) when someone updates their status.
-- ⚡ **Optimized**: High performance with minimal client/server overhead.
-- 🛠️ **Developer Friendly**: Easy-to-use exports for integration with other scripts.
+- ⚡ **Optimized**: High performance with minimal client/server overhead (0.00ms idle).
+- 🛠️ **Developer Friendly**: Comprehensive exports for easy integration.
 
 ---
 
-## 📦 Dependencies
+## 📦 Compatibility & Dependencies
 
-To ensure this script works correctly, you must have the following resources installed:
-
-- [qbx_core](https://github.com/Qbox-Project/qbx_core)
+### Required
 - [ox_lib](https://github.com/overextended/ox_lib)
-- [ox_target](https://github.com/overextended/ox_target)
+
+### Supported Frameworks (Auto-detected)
+- **Qbox** (`qbx_core`)
+- **QBCore** (`qb-core`)
+- **ESX** (`es_extended`)
+
+### Supported Target Systems (Auto-detected)
+- **ox_target**
+- **qb-target**
 
 ---
 
@@ -35,7 +45,7 @@ To ensure this script works correctly, you must have the following resources ins
    ```cfg
    ensure lcky-status
    ```
-4. Restart your server or `ensure` the resource.
+4. Restart your server.
 
 ---
 
@@ -45,7 +55,7 @@ To ensure this script works correctly, you must have the following resources ins
 - **Command**: `/status` - Opens the status management menu.
   - **Set Status**: Enter a custom message (e.g., "Working at the Forge", "AFK - Brb").
   - **Clear Status**: Removes your current status.
-- **Interaction**: Press your interaction key (default `Alt`) while looking at another player to see their status.
+- **Interaction**: Use your interaction key (Alt / G) while looking at another player to see their status.
 
 ### Proximity Alerts
 When you update your status, players within a **10-meter radius** will receive a notification informing them of the change.
@@ -53,8 +63,6 @@ When you update your status, players within a **10-meter radius** will receive a
 ---
 
 ## 💻 Developer API
-
-You can use the following exports in your other scripts:
 
 ### Server-side
 ```lua
@@ -71,15 +79,10 @@ exports['lcky-status']:SetPlayerStatus(source, "Working")
 local status = exports['lcky-status']:GetPlayerStatusFromServer()
 ```
 
----
-
-## 📄 To do
-
-Make the system compatible with other frameworks.
 
 ---
 
 ## 👨‍💻 Credits
 
 Developed by **Lucky Scripts**.
-Special thanks to the **Qbox Project** and **Overextended** team for their amazing libraries.
+Special thanks to the **Qbox Project**, **Overextended** teams.
