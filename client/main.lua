@@ -1,28 +1,27 @@
 -- lcky-status/client/main.lua
--- Ana client-side mantık dosyası
+-- Main client-side logic
 
--- Oyuncunun mevcut durumu (local cache)
+-- Player's current status (local cache)
 local currentPlayerStatus = nil
 
--- /durum komutu - Ana komut handler
+-- /status command - Main command handler
 RegisterCommand('status', function(source, args, rawCommand)
-    -- interact.lua'daki context menüyü aç
     OpenStatusMenu()
 end, false)
 
--- Server event: Durum güncelleme
+-- Server event: Status update
 RegisterNetEvent('lcky-status:client:updateStatus', function(newStatus)
     currentPlayerStatus = newStatus
 end)
 
--- Server event: Durum temizleme
+-- Server event: Status clear
 RegisterNetEvent('lcky-status:client:clearStatus', function()
     currentPlayerStatus = nil
 end)
 
--- Server event: Bildirim al
+-- Server event: Receive notification
 RegisterNetEvent('lcky-status:client:receiveNotify', function(playerName)
-    lib.notify({
+    Bridge.Notify({
         title = 'Status Updated',
         description = playerName .. ' updated status:',
         type = 'inform',
@@ -30,24 +29,24 @@ RegisterNetEvent('lcky-status:client:receiveNotify', function(playerName)
     })
 end)
 
--- Oyuncunun mevcut durumunu al
+-- Get player's current status
 ---@return string|nil
 function GetPlayerStatus()
     return currentPlayerStatus
 end
 
--- Oyuncunun durumunu ayarla (local)
+-- Set player status (local)
 ---@param status string
 function SetPlayerStatus(status)
     currentPlayerStatus = status
-    -- Server event tetikle - durumu database'e kaydet
+    -- Trigger server event - save status to database
     TriggerServerEvent('lcky-status:server:updateStatus', status)
 end
 
--- Server'dan mevcut durumu al (callback) - global fonksiyon
+-- Get current status from server (callback) - global function
 GetPlayerStatusFromServer = function()
     return lib.callback.await('lcky-status:server:getPlayerStatus', false)
 end
 
--- Export: Server'dan durum almak için
+-- Export: Get status from server
 exports('GetPlayerStatusFromServer', GetPlayerStatusFromServer)
