@@ -1,62 +1,62 @@
 -- lcky-status/server/main.lua
--- Server-side durum yönetimi
+-- Server-side status management
 
--- Client'tan gelen durum güncelleme event'i
+-- Status update event from client
 RegisterNetEvent('lcky-status:server:updateStatus', function(newStatus)
     local src = source
     
-    -- qbx_core SetMetadata export'ını kullanarak oyuncunun metadata'sına kaydet
-    exports.qbx_core:SetMetadata(src, 'statuses', newStatus)
+    -- Save to player metadata using Bridge system
+    Bridge.SetMetadata(src, 'statuses', newStatus)
     
-    -- Başarı bildirimini client'a gönder
+    -- Send success notification to client
     TriggerClientEvent('lcky-status:client:updateStatus', src, newStatus)
 end)
 
--- Client'tan gelen durum temizleme event'i
+-- Status clear event from client
 RegisterNetEvent('lcky-status:server:clearStatus', function()
     local src = source
     
-    -- qbx_core SetMetadata export'ını kullanarak oyuncunun metadata'sını temizle
-    exports.qbx_core:SetMetadata(src, 'statuses', nil)
+    -- Clear player metadata using Bridge system
+    Bridge.SetMetadata(src, 'statuses', nil)
     
-    -- Başarı bildirimini client'a gönder
+    -- Send success notification to client
     TriggerClientEvent('lcky-status:client:clearStatus', src)
 end)
 
--- Yakındaki oyunculara bildirim gönder
+-- Send notification to nearby players
 RegisterNetEvent('lcky-status:server:sendNotifyToPlayer', function(targetServerId)
     local src = source
     local playerName = GetPlayerName(src)
     
-    -- Hedef oyuncuya bildirim gönder
+    -- Send notification to target player
     TriggerClientEvent('lcky-status:client:receiveNotify', targetServerId, playerName)
 end)
 
--- Oyuncunun durumunu al (callback - ox_lib için)
+-- Get player status (callback - for ox_lib)
 lib.callback.register('lcky-status:server:getPlayerStatus', function(source)
-    return exports.qbx_core:GetMetadata(source, 'statuses')
+    return Bridge.GetMetadata(source, 'statuses')
 end)
 
--- Oyuncunun durumunu al (callback - ID ile - ox_target için)
+-- Get player status (callback - by ID - for targeting)
 lib.callback.register('lcky-status:server:getPlayerStatusById', function(source, targetServerId)
-    -- Hedef oyuncunun source'unu al
-    local targetPlayer = exports.qbx_core:GetPlayer(targetServerId)
+    -- Get target player
+    local targetPlayer = Bridge.GetPlayer(targetServerId)
     if not targetPlayer then
         return nil
     end
     
-    return exports.qbx_core:GetMetadata(targetServerId, 'statuses')
+    return Bridge.GetMetadata(targetServerId, 'statuses')
 end)
 
--- Oyuncunun durumunu al (export olarak kullanılabilir)
+-- Get player status (available as export)
 exports('GetPlayerStatus', function(source)
-    return exports.qbx_core:GetMetadata(source, 'statuses')
+    return Bridge.GetMetadata(source, 'statuses')
 end)
 
--- Oyuncunun durumunu ayarla (export olarak kullanılabilir)
+-- Set player status (available as export)
 exports('SetPlayerStatus', function(source, status)
-    exports.qbx_core:SetMetadata(source, 'statuses', status)
+    Bridge.SetMetadata(source, 'statuses', status)
     
-    -- Client'a bildir
+    -- Notify client
     TriggerClientEvent('lcky-status:client:updateStatus', source, status)
 end)
